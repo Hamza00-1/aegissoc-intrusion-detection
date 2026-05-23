@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AegisSOC | AI Intrusion Detection</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">AI-Powered Cybersecurity</p>
+                <h1>AegisSOC Intrusion Detection</h1>
+            </div>
+            <div class="service-status">
+                <span class="status-dot"></span>
+                <span>API ready on port 8000</span>
+            </div>
+        </header>
+
+        <main class="workspace">
+            <section class="panel prediction-panel">
+                <div class="section-heading">
+                    <p class="eyebrow">Single Record</p>
+                    <h2>Threat Classifier</h2>
+                </div>
+
+                <div class="preset-strip" id="preset-strip">
+                    <button type="button" class="preset-button active" data-preset="Normal">Normal</button>
+                    <button type="button" class="preset-button" data-preset="DoS">DoS</button>
+                    <button type="button" class="preset-button" data-preset="Exploit">Exploit</button>
+                    <button type="button" class="preset-button" data-preset="Reconnaissance">Recon</button>
+                    <button type="button" class="preset-button" data-preset="Generic Attack">Generic</button>
+                    <button type="button" class="preset-button" data-preset="Brute Force">Brute Force</button>
+                </div>
+                <div class="expected-output" id="expected-output">
+                    Expected class: <strong>Normal</strong>
+                </div>
+
+                <form id="prediction-form" class="input-grid">
+                    <label>
+                        Protocol
+                        <select name="protocol_type">
+                            <option value="tcp">TCP</option>
+                            <option value="udp">UDP</option>
+                            <option value="icmp">ICMP</option>
+                        </select>
+                    </label>
+                    <label>
+                        Duration
+                        <input name="duration" type="number" min="0" step="0.01" value="0.5">
+                    </label>
+                    <label>
+                        Source Bytes
+                        <input name="src_bytes" type="number" min="0" step="1" value="450">
+                    </label>
+                    <label>
+                        Destination Bytes
+                        <input name="dst_bytes" type="number" min="0" step="1" value="1200">
+                    </label>
+                    <label>
+                        Failed Logins
+                        <input name="num_failed_logins" type="number" min="0" step="1" value="0">
+                    </label>
+                    <label>
+                        Connection Count
+                        <input name="count" type="number" min="0" step="1" value="24">
+                    </label>
+                    <label>
+                        Service Count
+                        <input name="srv_count" type="number" min="0" step="1" value="18">
+                    </label>
+                    <label>
+                        SYN Error Rate
+                        <input name="serror_rate" type="number" min="0" max="1" step="0.01" value="0.05">
+                    </label>
+                    <label>
+                        REJ Error Rate
+                        <input name="rerror_rate" type="number" min="0" max="1" step="0.01" value="0.02">
+                    </label>
+                    <label>
+                        Same Service Rate
+                        <input name="same_srv_rate" type="number" min="0" max="1" step="0.01" value="0.8">
+                    </label>
+                    <label>
+                        Different Service Rate
+                        <input name="diff_srv_rate" type="number" min="0" max="1" step="0.01" value="0.08">
+                    </label>
+                    <label>
+                        Destination Host Count
+                        <input name="dst_host_count" type="number" min="0" step="1" value="65">
+                    </label>
+                    <label>
+                        Destination Host Service Count
+                        <input name="dst_host_srv_count" type="number" min="0" step="1" value="45">
+                    </label>
+
+                    <button type="submit" class="primary-action">Run Prediction</button>
+                </form>
+            </section>
+
+            <section class="panel result-panel" id="single-result">
+                <div class="section-heading">
+                    <p class="eyebrow">Model Output</p>
+                    <h2>Prediction Result</h2>
+                </div>
+                <div class="empty-state">Submit a record to see the predicted attack family.</div>
+            </section>
+
+            <section class="panel upload-panel">
+                <div class="section-heading">
+                    <p class="eyebrow">Batch Analysis</p>
+                    <h2>CSV Network Logs</h2>
+                </div>
+                <div class="drop-zone" id="drop-zone">
+                    <strong>Drop a CSV file here</strong>
+                    <span>or click to choose sample_network_logs.csv</span>
+                    <input type="file" id="file-input" accept=".csv" hidden>
+                </div>
+                <div class="loading hidden" id="loading-state">Analyzing traffic with the trained model...</div>
+            </section>
+
+            <section class="metrics-row hidden" id="metrics-row">
+                <article class="metric-card">
+                    <span>Total Records</span>
+                    <strong id="total-records">0</strong>
+                </article>
+                <article class="metric-card">
+                    <span>Threats</span>
+                    <strong class="danger-text" id="threats-detected">0</strong>
+                </article>
+                <article class="metric-card">
+                    <span>Best Model</span>
+                    <strong id="best-model">--</strong>
+                </article>
+                <article class="metric-card">
+                    <span>Accuracy</span>
+                    <strong id="model-accuracy">--</strong>
+                </article>
+                <article class="metric-card export-card">
+                    <span>Export Results</span>
+                    <div class="export-actions">
+                        <button type="button" id="export-csv">CSV</button>
+                        <button type="button" id="export-json">JSON</button>
+                    </div>
+                </article>
+            </section>
+
+            <section class="analysis-grid hidden" id="analysis-grid">
+                <div class="panel">
+                    <div class="section-heading">
+                        <p class="eyebrow">Distribution</p>
+                        <h2>Attack Families</h2>
+                    </div>
+                    <div class="bar-chart" id="attack-chart"></div>
+                </div>
+
+                <div class="panel table-panel">
+                    <div class="section-heading table-heading">
+                        <div>
+                            <p class="eyebrow">Predictions</p>
+                            <h2>Threat Matrix</h2>
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Protocol</th>
+                                    <th>Traffic</th>
+                                    <th>Class</th>
+                                    <th>Risk</th>
+                                    <th>Confidence</th>
+                                </tr>
+                            </thead>
+                            <tbody id="results-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
