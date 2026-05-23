@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: aegissoc-intrusion-detection
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && cd ml_model && python generate_data.py && python train.py
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
