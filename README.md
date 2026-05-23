@@ -79,12 +79,14 @@ This project is prepared for a single free Render web service.
 1. Push the `SOC-Dashboard` folder to GitHub.
 2. Open Render and create a new Web Service from that repository.
 3. Use these settings:
-   - Build command: `pip install -r requirements.txt`
+   - Build command: `pip install -r requirements.txt && cd ml_model && python generate_data.py && python train.py`
    - Start command: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
    - Plan: Free
 4. After deployment, open the Render URL. The frontend is served by FastAPI at `/`.
 
 The included `render.yaml` can also be used as a Render Blueprint.
+
+Generated files such as `ml_model/data/network_traffic.csv` and `ml_model/saved_models/*.pkl` are intentionally ignored in Git. They are rebuilt from the included training scripts.
 
 ## Dataset Note
 
