@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+pip-wheel-metadata/
+
+# Logs and local runtime files
+*.log
+uvicorn.out.log
+uvicorn.err.log
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Local secrets
+.env
+.env.*
+
+# Generated model artifacts
+ml_model/saved_models/
+!ml_model/saved_models/.gitkeep
+
+# Generated full training dataset
+ml_model/data/network_traffic.csv
